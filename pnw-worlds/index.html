@@ -15482,6 +15482,12 @@ td.over {
     beginHole(round, 0);
     return round;
   }
+  function startEventRoundAt(player, eventId, hole4 = 1) {
+    const round = startEventRound(player, eventId);
+    const at = Math.max(0, round.holes.indexOf(Number(hole4)) >= 0 ? round.holes.indexOf(Number(hole4)) : Math.min(round.holes.length - 1, Number(hole4) - 1 || 0));
+    if (at > 0) beginHole(round, at);
+    return round;
+  }
   var LEAGUE_NIGHT = Object.freeze({
     id: "league-night",
     name: "League Night",
@@ -22728,6 +22734,7 @@ td.over {
     }
   }
   function save() {
+    if (game.visiting) return;
     try {
       if (game.player) localStorage.setItem(SAVE_KEY, serializePlayer(game.player));
     } catch (_) {
@@ -23467,15 +23474,25 @@ td.over {
     }
     requestAnimationFrame(frame);
   }
+  function openFromLink() {
+    if (typeof location === "undefined") return false;
+    const q = new URLSearchParams(location.search), id = q.get("play");
+    if (!id || !eventById(id)) return false;
+    game.visiting = true;
+    game.player = newPlayer({ name: "Visitor", styleId: styleById(q.get("style")).id, seed: 1983 });
+    game.club = clubOf(eventById(id));
+    beginRound(startEventRoundAt(game.player, id, q.get("hole") || 1));
+    return true;
+  }
   resize();
   bind();
-  show("title");
+  if (!openFromLink()) show("title");
   requestAnimationFrame(frame);
   if (typeof window !== "undefined") window.__midwest = { game, action, adjust, show, overlayAction };
   sendPlayLog();
 })();
 </script>
-<script>window.__BUILD__={"lane":"pnw-worlds","commit":"faed428","subject":"New core: ground that grips like turf, and the filmed throws judged without the slide's help","branch":"claude/pnw-worlds","time":"2026-11-26T08:56:22.739Z","dirty":false};</script>
+<script>window.__BUILD__={"lane":"pnw-worlds","commit":"d8c829b","subject":"Phone loop: publish a lane to the build-only page, with a page shell and links onto a hole","branch":"claude/pnw-worlds","time":"2026-11-26T09:00:56.307Z","dirty":false};</script>
 <script>
 // The page shell added to every published build (tools/pages/publish.mjs injects this file).
 // It is not part of the game: it is how a build is played and judged on a phone.
@@ -23518,7 +23535,7 @@ td.over {
     var problems = [], w = window.innerWidth, h = window.innerHeight;
     if (document.documentElement.scrollWidth > w + 1) problems.push('The page scrolls sideways: it is ' + document.documentElement.scrollWidth + ' px wide on a ' + w + ' px screen.');
     var name = function (n) { return (n.id ? '#' + n.id : n.tagName.toLowerCase()) + (n.textContent ? ' "' + n.textContent.trim().slice(0, 24) + '"' : ''); };
-    var shown = function (n) { if (bar.contains(n)) return false; var r = n.getBoundingClientRect(), s = getComputedStyle(n); return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none' && n.offsetParent !== null; };
+    var shown = function (n) { if (bar.contains(n)) return false; var r = n.getBoundingClientRect(), s = getComputedStyle(n); if (!(r.width > 0 && r.height > 0) || s.visibility === 'hidden' || s.display === 'none') return false; for (var p = n; p && p !== document.body; p = p.parentElement) if (p.hidden) return false; return true; };
     var taps = Array.prototype.filter.call(document.querySelectorAll('button, a[href], input, select, [role="button"], [data-act], [data-cheat], [data-disc]'), shown);
     taps.forEach(function (n) {
       var r = n.getBoundingClientRect();

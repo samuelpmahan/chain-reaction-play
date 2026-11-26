@@ -1,10 +1,10 @@
 {
  "pnw-worlds": {
   "lane": "pnw-worlds",
-  "commit": "faed428",
-  "subject": "New core: ground that grips like turf, and the filmed throws judged without the slide's help",
+  "commit": "d8c829b",
+  "subject": "Phone loop: publish a lane to the build-only page, with a page shell and links onto a hole",
   "branch": "claude/pnw-worlds",
-  "time": "2026-11-26T08:56:22.739Z",
+  "time": "2026-11-26T09:00:56.307Z",
   "dirty": false
  }
 }
